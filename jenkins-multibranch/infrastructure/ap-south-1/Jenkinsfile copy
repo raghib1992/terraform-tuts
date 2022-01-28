@@ -1,0 +1,182 @@
+def awsRegionMap = [
+    "mumbai" : "ap-south-1",
+    "seoul"  : "ap-northeast-2"
+]
+
+pipeline {
+    agent any
+
+    environment {
+        AWS_ACCESS_KEY_ID                     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY                 = credentials('AWS_SECRET_ACCESS_KEY')
+        // TF_VAR_nlb_http_health_checks_enabled = "${nlb_http_health_checks}"
+    }
+
+    parameters {
+        booleanParam(name: "APPLY_TO_LOOP", defaultValue: false, description: "Select if you want to deploy to all region")
+    //     choice name: 'CITY', choices: cityList, description: 'City for SaaS-global job'
+    //     booleanParam(name: 'run_script', defaultValue: false, description: 'when to push the code to to allow not to run script')
+        booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
+    }
+
+    stages {
+        stage ('Deploy to sc-saas-global') {
+            parallel {
+                stage ("Deploy to Single Region") {
+                    when {
+                        expression { !params.APPLY_TO_LOOP}
+                    }
+                    stages {
+                        stage ('Terraform Init and Plan') {
+                            steps {
+                                script {
+                                    dir('infrastructure/ap-south-1/') {
+                                        sh """
+                                            echo "Initializing Terraform"
+                                            terraform init
+                                            terraform plan -out tfplan -input=false
+                                            terraform show -no-color tfplan > tfplan.txt
+                                            """
+                                    }
+                                }
+                            }
+                        }
+                        stage ('Approval') {
+                            when {
+                                not {
+                                    equals expected: true, actual: params.autoApproval
+                                }
+                            }
+                            steps {
+                                script {
+                                    dir('infrastructure/ap-south-1/') {
+                                        def plan = readFile 'tfplan.txt'
+                                        input message: "Do you want to apply the plan?",
+                                        parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
+                                        }
+                                }
+                            }
+                        }
+                        stage ('Apply') {
+                            steps {
+                                dir('infrastructure/ap-south-1/') {
+                                    sh """
+                                        terraform apply -no-color -input=false tfplan
+                                        """
+                                }
+                            }
+                        }
+                    }
+                }
+                stage("Deploy to all Region") {
+                    when {
+                        expression { params.APPLY_TO_LOOP }
+                    }
+                    stages {
+                        stage ('Terraform loop') {
+                            steps {
+                                echo "terraform looping into all provided region in awsRegionMap"
+                                script {
+                                    dir ('infrastructure/ap-south-1/') {
+                                        awsRegionMap.each { entry ->
+                                            stage (entry.key) {
+                                                sh """
+                                                    echo REGION =\\\"${entry.value}\\\" > terraform.tfvars
+                                                    cat terraform.tfvars
+                                                    terraform init
+                                                    terraform plan -out tfplan -input=false
+                                                    terraform show -no-color tfplan > tfplan.txt
+                                                    terraform apply -auto-approve -no-color
+                                                    """
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+        // stage ('Init') {
+        //     steps {
+        //         echo "initializing terraform"
+        //         script {
+        //             dir('infrastructure/ap-south-1/') {
+        //                 sh """
+        //                     terraform init
+        //                     """
+        //             }
+        //         }
+        //     }
+        // }
+
+
+        // stage ('plan') {
+        //     steps {
+        //         echo "terraform plan"
+        //         script {
+        //             dir('infrastructure/ap-south-1/') {
+        //                 sh """
+        //                     terraform plan -out tfplan -input=false
+        //                     terraform show -no-color tfplan > tfplan.txt
+        //                     """
+        //             }
+        //         }
+        //     }
+        // }
+
+
+        // stage ('Approval') {
+        //     when {
+        //         not {
+        //             equals expected: true, actual: params.autoApproval
+        //         }
+        //     }
+        //     steps {
+        //         script {
+        //             dir('infrastructure/ap-south-1/') {
+        //                 def plan = readFile 'tfplan.txt'
+        //                 input message: "Do you want to apply the plan?",
+        //                 parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
+        //                 }
+        //         }
+        //     }
+        // }
+
+        // stage ('Apply') {
+        //     steps {
+        //         dir('infrastructure/ap-south-1/') {
+        //             sh """
+        //                 terraform apply -no-color -input=false tfplan
+        //                 """
+        //         }
+        //     }
+        // }
+
+    //     stages {
+    //     stage ('all region loop') {
+    //         steps {
+    //             echo "terraform looping into all provided region in awsRegionMap"
+    //             script {
+    //                 dir ('infrastructure/ap-south-1/') {
+    //                     awsRegionMap.each { entry ->
+    //                         stage (entry.key) {
+    //                             stages {
+    //                                 stage "Init" {
+    //                                     steps {
+    //                                         echo "$entry.value"
+    //                                     }
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }

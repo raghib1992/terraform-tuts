@@ -1,0 +1,35 @@
+#!/bin/bash
+mkdir /opt/securecircle && chown root.docker /opt/securecircle && chmod g+rwx /opt/securecircle  && cd /opt/securecircle
+yum install -y awscli https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+systemctl enable docker && systemctl start docker
+
+echo "### Begining of docker-compose file
+version: '3'
+networks:
+  my-network-name:
+services:
+  nginx: 
+    image: nginx:latest
+    container_name: production_nginx
+    networks:
+      - my-network-name
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+      - 443:443
+      
+  ismydependencysafe:
+    image: ismydependencysafe:latest
+    container_name: production_ismydependencysafe
+    networks:
+      - my-network-name
+    expose:
+      - "80"
+### End of the docker-compose file
+" > /opt/securecircle/docker-compose.yml
+
+docker-compose up -d
