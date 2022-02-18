@@ -1,0 +1,25 @@
+{
+  "source": [
+    "aws.ec2"
+  ],
+  "detail-type": [
+    "EC2 Instance State-change Notification"
+  ],
+  "detail": {
+    "state": [
+      "stopped"
+    ]
+  }
+}
+
+{
+    "Sid": "TrustCWEToPublishEventsToMyTopic",
+    "Effect": "Allow",
+    "Principal": {
+      "Service": "events.amazonaws.com"
+    },
+    "Action": "sns:Publish",
+    "Resource": "arn:aws:sns:region:account-id:topic-name"
+  }
+
+  attach_sqs_policy
