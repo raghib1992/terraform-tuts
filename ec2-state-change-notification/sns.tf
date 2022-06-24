@@ -5,7 +5,7 @@ resource "aws_sns_topic" "aws_logins" {
 resource "aws_sns_topic_subscription" "sns-subscritption" {
   topic_arn = aws_sns_topic.aws_logins.arn
   protocol = "email"
-  endpoint = "azimraghib@gmail.com"
+  endpoint = "a@gmail.com"
 }
 
 resource "aws_sns_topic_policy" "default" {
