@@ -20,6 +20,6 @@ output "vpc_main_id" {
 # }
 
 resource "aws_subnet" "tuts-subnet" {
-    vpc_id = data.aws_vpc.main.id
-    cidr_block = "10.5.0.0/24"
+  vpc_id     = data.aws_vpc.main.id
+  cidr_block = "10.5.0.0/24"
 }
