@@ -1,3 +1,4 @@
+/*
 provider "aws" {
   alias  = "dev"
   region = "us-east-1"
@@ -27,3 +28,4 @@ resource "aws_instance" "tuts" {
     Name = "tuts-${each.key}"
   }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 locals {
   setup_name  = "tuts"
   environmant = "dev"
@@ -22,7 +23,7 @@ resource "aws_subnet" "web" {
     Name = "${local.setup_name}-subnet"
   }
 }
-/*
+
 resource "aws_instance" "web-app" {
   instance_type = var.my_instance_type
   ami = data.aws_ami.amazon-linux-2.id
