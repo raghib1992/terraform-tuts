@@ -3,7 +3,7 @@
 ### 2. Current state is actual state of resoucres that is currently deployed
 
 ## Refresh
-### check the latest stag=te of your infra update the state file accordingly
+### Update the state file as per current infra
 ```
 terraform refresh
 ```
