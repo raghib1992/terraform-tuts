@@ -3,19 +3,18 @@ provider "aws" {
 }
 
 
-resource "aws_iam_user" "lb" {
-  name = "demo-user.${count.index}"
-  count = 3
-  path = "/system/"
+resource "aws_instance" "myec2" {
+  ami           = "ami-0d951b011aa0b2c19"
+  instance_type = "t2.micro"
+  key_name      = "mumbai-key"
+
+  provisioner "local-exec" {
+    command = "echo ${aws_instance.myec2.private_ip} >> private-ip.txt"
+  }
 }
 
-output "arns" {
-  value = aws_iam_user.lb[*].arn
-}
-
-
-output "zipmap" {
-  value = zipmap(aws_iam_user.lb[*].name, aws_iam_user.lb[*].arn)
+output "public-ip" {
+  value = aws_instance.myec2.public_ip
 }
 
 
