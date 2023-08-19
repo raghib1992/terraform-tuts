@@ -2,18 +2,17 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-
-module "myec2" {
-  source = ".\\Modules\\ec2"
-  # instance_type = "t2.large"
+resource "aws_instance" "myec2" {
+   ami = "ami-0d951b011aa0b2c19"
+   instance_type = lookup(var.instance_type,terraform.workspace)
 }
 
+variable "instance_type" {
+  type = map(string)
 
-resource "aws_eip" "bar" {
-  vpc = true
-  instance  = module.myec2.inst.id
-}
-
-output "myip" {
-  value = module.myec2.inst.public_ip
+  default = {
+    default = "t2.nano"
+    dev     = "t2.micro"
+    prod     = "t2.large"
+  }
 }

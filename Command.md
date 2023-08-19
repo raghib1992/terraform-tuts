@@ -47,3 +47,13 @@ terraform plan -refresh=false
 ```sh
 terraform plan -target=ec2
 ```
+
+## Workspace
+```
+terraform workspace -h
+terraform workspace show
+terraform workspace list
+terraform workspace select <ws name>
+terraform workspace new <ws name>
+```
+
