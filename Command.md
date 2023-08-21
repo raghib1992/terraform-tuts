@@ -49,7 +49,7 @@ terraform plan -target=ec2
 ```
 
 ## Workspace
-```
+```sh
 terraform workspace -h
 terraform workspace show
 terraform workspace list
@@ -57,3 +57,12 @@ terraform workspace select <ws name>
 terraform workspace new <ws name>
 ```
 
+## To change backend setign from s3 to local
+```sh
+terraform init -migrate-state
+terraform init -reconfigure
+```
+
+
+## TO forcefuly write 
+terraform destroy -auto-approve -lock=false
