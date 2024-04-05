@@ -1,99 +1,125 @@
-# link: https://jhooq.com/terragrunt-guide/?query=terragr
+# Ref link: https://jhooq.com/terragrunt-guide/?query=terragr
 
-How to use Terragrunt?
+# How to use Terragrunt?
 
-Terragrunt is an additional wrapper that is built on top of the Terraform. Terraform is a great Infrastructure as Code tool for managing your cloud infrastructure. But as the project size grows and you have multiple environments (Development, Testing, Staging, Production, etc..) to manage then you will realize Terraform has a lot of gaps for managing a complex and large project.
+###### Terragrunt is an additional wrapper that is built on top of the Terraform. Terraform is a great Infrastructure as Code tool for managing your cloud infrastructure. But as the project size grows and you have multiple environments (Development, Testing, Staging, Production, etc..) to manage then you will realize Terraform has a lot of gaps for managing a complex and large project.
 
-Challenges with Terraform - If you are managing multiple environments (Development, Testing, Staging, and Production etc..) infrastructure with Terraform then here are the challenges you might face with Terraform -
+###### Challenges with Terraform - If you are managing multiple environments (Development, Testing, Staging, and Production etc..) infrastructure with Terraform then here are the challenges you might face with Terraform -
 
-Redundancy of code - Multiple copies of the same code for each environment.
+###### Redundancy of code - Multiple copies of the same code for each environment.
 
-Manual update of code - If there are the same variables that are being used for all the environments then you have to remember and manually update each variable.
+###### Manual update of code - If there are the same variables that are being used for all the environments then you have to remember and manually update each variable.
 
-Terragrunt by gruntwork was built to improve the shortcomings around the Terraform for effectively managing the infrastructure code so that developers can use the same code without any kind of duplication by keeping the terraform code dry. Terragrunt not only helps you with managing your terraform workspaces effectively but it can also help you with multiple terraform modules, managing Terraform remote state, etc.
+###### Terragrunt by gruntwork was built to improve the shortcomings around the Terraform for effectively managing the infrastructure code so that developers can use the same code without any kind of duplication by keeping the terraform code dry. Terragrunt not only helps you with managing your terraform workspaces effectively but it can also help you with multiple terraform modules, managing Terraform remote state, etc.
 
-This guide will you get started with Terragrunt and also you will find example codes for your reference. It will be a very beginner's level guide for those who want to learn Terragrunt and in this guide, we will be taking one basic example of Setting up EC2 instance using Terragrunt for DEV and TEST
+###### This guide will you get started with Terragrunt and also you will find example codes for your reference. It will be a very beginner's level guide for those who want to learn Terragrunt and in this guide, we will be taking one basic example of Setting up EC2 instance using Terragrunt for DEV and TEST
 
 
-## 1. How to install Terragrunt?
-Before installing Terragrunt you must complete one pre-requisite by installing Terraform because Terragrunt is just a wrapper around terraform, so to use Terragrunt you must install Terraform.
+1. How to install Terragrunt?
+- Before installing Terragrunt you must complete one pre-requisite by installing Terraform because Terragrunt is just a wrapper around terraform, so to use Terragrunt you must install Terraform.
 
 There are a couple of ways of installing Terragrunt -
 
-### 1.1 Manually download the Terragrunt Binary
-1. Download - Goto GitHub release pages of *[gruntwork-io/terragrunt](https://github.com/gruntwork-io/terragrunt/releases)* and download the binary based on the operating system of your choice
-2. Untar
-```sh
-sudo tar xvf terragrunt-0.56.1.tar.gz
-```
-2. Rename - Rename the downloaded binary file to terragrunt.
-```sh
-sudo mv terragrunt-0.56.1 terragrunt
-```
-3. Make it Executable - Change the binary file permission to make it executable.
-```sh
-sudo chmod u+x terragrunt 
-```
-4. Move the binary file to /usr/local/bin(Linux and Mac)
-```sh
-sudo mv terragrunt /usr/local/bin/terragrunt
-```
-### 1.2 Install Terragrunt using package manager
-- If you do not like the manual installation of the Terragrunt then you can go with the package manager based on your operating system choice.
+- 1.1 Manually download the Terragrunt Binary
+    -  Download - Goto GitHub release pages of *[gruntwork-io/terragrunt](https://github.com/gruntwork-io/terragrunt/releases)* and download the binary based on the operating system of your choice
+    - Untar
+    ```sh
+    sudo tar xvf terragrunt-0.56.1.tar.gz
+    ```
+    - Rename - Rename the downloaded binary file to terragrunt.
+    ```sh
+    sudo mv terragrunt-0.56.1 terragrunt
+    ```
+    - Make it Executable - Change the binary file permission to make it executable.
+    ```sh
+    sudo chmod u+x terragrunt 
+    ```
+    - Move the binary file to /usr/local/bin(Linux and Mac)
+    ```sh
+    sudo mv terragrunt /usr/local/bin/terragrunt
+    ```
+- 1.2 Install Terragrunt using package manager
+    - If you do not like the manual installation of the Terragrunt then you can go with the package manager based on your operating system choice.
 
-##### **Windows**- For windows you can rely on chocolatey package manager -
-```bash
-choco install terragrunt 
-```
-##### macOS- For mac you can install it with the help of Homebrew -
-```bash
-brew install terragrunt
-```
-##### Linux- For Linux either you could use Homebrew just like mac or you could go with manual installation. For Arch Linux user you could use the following installation command -
-```sh
-pacman -S terragrunt
-sudo snap install terragrunt
-```
+    - **Windows**- For windows you can rely on chocolatey package manager -
+    ```bash
+    choco install terragrunt 
+    ```
+    - **macOS**- For mac you can install it with the help of Homebrew -
+    ```bash
+    brew install terragrunt
+    ```
+    - **Linux**- For Linux either you could use Homebrew just like mac or you could go with manual installation. For Arch Linux user you could use the following installation command -
+    ```sh
+    pacman -S terragrunt
+    sudo snap install terragrunt
+    ```
 
-## 2. Write your first Terragrunt implementation using the ec2-instance module
+2. Write your first Terragrunt implementation using the ec2-instance module
 
-In the previous step we have installed the Terragrunt along with Terraform. Now next problem we have is How to use Terragrunt for provisioning the cloud infrastructure?
+- In the previous step we have installed the Terragrunt along with Terraform. Now next problem we have is How to use Terragrunt for provisioning the cloud infrastructure?
 
-But before we answer the question there are few points which you should know about terragrunt -
+- But before we answer the question there are few points which you should know about terragrunt -
 
-Terragrunt never recommends duplication of code.
+    - Terragrunt never recommends duplication of code.
 
-Terragrunt heavily relies on modules, so that we can keep our code dry without polluting with the duplicate code
+    - Terragrunt heavily relies on modules, so that we can keep our code dry without polluting with the duplicate code
 
-What are the necessary configuration you need to write your first Terragrunt implementation?
+- What are the necessary configuration you need to write your first Terragrunt implementation?
 
-- Terraform AWS modules *(Note - If you are working with Google Cloud then refer to Google Module)*
+    - Terraform AWS modules *(Note - If you are working with Google Cloud then refer to Google Module)*
 
-- You will need terragrunt.hcl for writing your Terragrunt configuration.
+    - You will need terragrunt.hcl for writing your Terragrunt configuration.
 
-- Use commands - `terragrunt plan, terragrunt apply, terragrunt output, terragrunt destroy`
+    - Use commands - `terragrunt plan, terragrunt apply, terragrunt output, terragrunt destroy`
 
-### 2.1 Package structure for my Terragrunt project
-To keep the things simple I am gonna use the very a basic example in which we are going to setup an EC2 instance on DEV and TEST environments using terragrunt
+- 2.1 Package structure for my Terragrunt project
+- To keep the things simple I am gonna use the very a basic example in which we are going to setup an EC2 instance on DEV and TEST environments using terragrunt
 
-Project Structure - Here is the screenshot of my project structure -
-![alt text](image.png)
+    - Project Structure - Here is the screenshot of my project structure -
 
-EC2 Instance Module - To use Terragrun we need to know the modules which we are going to use in our project. But since this is a getting started a project we are doing, I decided to go ahead with EC2 Module.
-Here are a few starting lines of your terrgrunt.hcl where you need to mention the reference of EC2 Module -
-![alt text](image-1.png)
+    ![alt text](image.png)
 
-Notes-
+    - EC2 Instance Module - To use Terragrun we need to know the modules which we are going to use in our project. But since this is a getting started a project we are doing, I decided to go ahead with EC2 Module.
+        - Here are a few starting lines of your terrgrunt.hcl where you need to mention the reference of EC2 Module -
+        ```t
+        #path - /terragrunt-ec2/dev/terragrunt.hcl
 
-As you can see we are referring to the remote EC2 Module with -
-Source URI - "tfr:///terraform-aws-modules/ec2-instance/aws?version=4.0.0"
+        terraform {
+        source = "tfr:///terraform-aws-modules/ec2-instance/aws?version=4.0.0"
+        }
+        ```
+        
 
-provider details- The next configuration we need to add inside terragrunt.hcl is the provider configuration. Provider configuration generally consists of three important elements -
-profile
-region
-credentials: In my current setup, I am using shared_credential_file to pass the credentials but you can use access_key and secret_key instead
-Here is the example configuration for the provider which we will be using inside the terragrunt.hcl -
-![alt text](image-2.png)
+        - Notes-
+
+            - As you can see we are referring to the remote EC2 Module with -          
+            ```
+            Surce URI - "tfr:///terraform-aws-modules/ec2-instance/aws?version=4.0.0"
+            ```
+
+    - provider details- The next configuration we need to add inside terragrunt.hcl is the provider configuration. Provider configuration generally consists of three important elements -
+        - profile
+        - region
+        - credentials: In my current setup, I am using shared_credential_file to pass the credentials but you can use access_key and secret_key instead
+        - Here is the example configuration for the provider which we will be using inside the terragrunt.hcl -
+        ```t
+        #path - /terragrunt-ec2/dev/terragrunt.hcl
+
+        generate "provider" {
+        path = "provider.tf"
+        if_exists = "overwrite_terragrunt"
+        contents = <<EOF
+        provider "aws" {
+            profile = "default"
+            region  = "eu-central-1"
+            shared_credentials_file = "/Users/rwagh/credentials"
+            # access_key = "<insert_your_access_key>"
+            # secret_key = "<insert_your_secret_key>"
+        }
+        EOF
+        }
+        ```
 
 - Notes -
 
