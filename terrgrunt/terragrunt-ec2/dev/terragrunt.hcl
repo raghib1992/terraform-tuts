@@ -8,8 +8,8 @@ generate "provider" {
     contents = <<EOF
     provider "aws" {
         profile = "default"
-        region  = "eu-central-1"
-        shared_credentials_file = "/Users/rwagh/credentials"
+        region  = "eu-north-1"
+        shared_credentials_file = ""
         # access_key = "<insert_your_access_key>"
         # secret_key = "<insert_your_secret_key>"
     }
