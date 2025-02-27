@@ -1,3 +1,8 @@
+1. Install aws cli on local machine
+2. Create IAM user in aws for terragrunt
+3. confidure aws cli
+4. install terraform
+5. Install Terragrunt
 
 
 # How to use Terragrunt?
