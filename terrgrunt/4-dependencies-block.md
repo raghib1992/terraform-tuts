@@ -1,0 +1,10 @@
+- It is used to configure module dependencies
+- It help to pass the resource details created under pressure module throughtout the configuration file as inputs.
+- Arguments
+    - name
+    - config_path
+    - skip_outputs
+    - mock_outputs
+    - mock_output_allowed_terraform_command
+    - mock_output_merge_strategy_state # depreceted
+    - mock_output_merge_strategy_with_state
