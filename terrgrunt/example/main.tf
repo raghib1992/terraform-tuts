@@ -1,6 +1,7 @@
 module "eks_vpc" {
   source = "./eks-vpc"
 
+  vpc_cidr       = var.vpc_cidr_block
   environment    = var.environment
   aws_region     = var.region_name
   public_subnet  = var.public_subnets

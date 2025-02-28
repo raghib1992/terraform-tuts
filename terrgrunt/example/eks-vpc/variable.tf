@@ -46,3 +46,7 @@ variable "priv_sub_tags" {
     "kubernetes.io/role/internal-elb" = "1"
   }
 }
+
+variable "vpc_cidr" {
+  type = string
+}

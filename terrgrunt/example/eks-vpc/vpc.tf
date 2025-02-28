@@ -1,6 +1,6 @@
 # terraform vpc cofiguration file
 resource "aws_vpc" "eks_vpc" {
-  cidr_block = "10.10.0.0/16"
+  cidr_block = var.vpc_cidr
 
   tags = local.common_tags
 }
