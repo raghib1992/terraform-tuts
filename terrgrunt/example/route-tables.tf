@@ -18,7 +18,7 @@ resource "aws_route" "eks_igw_route" {
 }
 
 resource "aws_route" "eks_ngw_route" {
-  route_table_id         = aws_route_table.eks_public_rt.id
+  route_table_id         = aws_route_table.eks_private_rt.id
   nat_gateway_id         = aws_nat_gateway.eks_nat.id
   depends_on             = [aws_internet_gateway.eks_ig]
   destination_cidr_block = "0.0.0.0/0"
