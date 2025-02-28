@@ -5,7 +5,13 @@ resource "aws_subnet" "eks_public_subnet" {
   cidr_block              = element(var.public_subnet, count.index)
   availability_zone = element(var.azs, count.index)
 
-  tags = local.common_tags
+  tags = merge(
+    var.pub_sub_tags,
+    local.common_tags,
+    {
+      "Name" = "${var.environment}-public-subnet-${element(var.public_subnet, count.index)}"
+    }
+  )
 }
 
 resource "aws_subnet" "eks_private_subnet" {
@@ -14,5 +20,11 @@ resource "aws_subnet" "eks_private_subnet" {
   cidr_block              = element(var.private_subnet, count.index)
   availability_zone = element(var.azs, count.index)
 
-  tags = local.common_tags
+  tags = merge(
+    var.priv_sub_tags,
+    local.common_tags,
+    {
+      "Name" = "${var.environment}-private-subnet-${element(var.private_subnet, count.index)}"
+    }
+  )
 }

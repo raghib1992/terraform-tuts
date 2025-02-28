@@ -1,2 +1,5 @@
-terraform.tf*
+terraform.tfstate
 .terraform*
+permanent.pub
+permanent.*
+permanent
