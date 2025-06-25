@@ -1,0 +1,58 @@
+# Stage 1: Build Stage – Bundle your app with esbuild
+FROM --platform=linux/amd64 registry.access.redhat.com/ubi9/nodejs-20-minimal:9.5-1739448741 AS build
+
+WORKDIR /usr/src/app
+USER root
+
+# Copy package files and install dependencies for bundling
+COPY package*.json ./
+RUN npm install --ignore-scripts
+
+# Copy all application source files and necessary directories
+COPY config ./config
+COPY controllers ./controllers
+COPY middleware ./middleware
+COPY migrations ./migrations
+COPY models ./models
+COPY routes ./routes
+COPY server.js ./
+COPY helpers ./helpers
+COPY specs ./specs
+COPY utils ./utils
+COPY cron ./cron
+COPY entrypoint.sh ./
+COPY .sequelizerc ./
+COPY esbuild.config.js ./
+COPY reports ./reports
+# Run esbuild to create the bundled output and copy package.json to dist
+RUN node esbuild.config.js && cp package.json dist/
+
+# Stage 2: Runtime Stage – Use the bundled output
+FROM --platform=linux/amd64 registry.access.redhat.com/ubi9/nodejs-20-minimal:9.5-1739448741
+
+WORKDIR /usr/src/app
+USER root
+
+# Copy the distribution directory from the build stage
+COPY --from=build /usr/src/app/dist/ .
+COPY --from=build /usr/src/app/entrypoint.sh .
+COPY --from=build /usr/src/app/.sequelizerc .
+COPY --from=build /usr/src/app/config ./config
+COPY --from=build /usr/src/app/migrations ./migrations
+COPY --from=build /usr/src/app/middleware/encDencInfo.js ./middleware/encDencInfo.js
+
+# Install only production dependencies if needed
+RUN npm install --production --ignore-scripts && \
+    npm install --ignore-scripts --save-dev sequelize sequelize-cli && \
+    npm install --ignore-scripts pm2 -g && \
+    chown -R 1001:0 /usr/src/app && \
+    chmod -R u+w /usr/src/app
+
+# Switch to a non-root user (UID 1001)
+USER 1001
+
+# Expose the application port
+EXPOSE 8080
+
+# Start your bundled app (adjust the entrypoint as needed)
+CMD ["sh", "./entrypoint.sh"]
