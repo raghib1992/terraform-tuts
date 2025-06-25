@@ -9,6 +9,9 @@ output "instance_publicip" {
   value = toset([for instance in aws_instance.myec2vm: instance.public_ip])
 }
 
+output "instace_privateip" {
+  value = [for i in aws_instance.myec2vm: i.private_ip]
+}
 # EC2 Instance Public DNS with TOSET
 output "instance_publicdns" {
   description = "EC2 Instance Public DNS"

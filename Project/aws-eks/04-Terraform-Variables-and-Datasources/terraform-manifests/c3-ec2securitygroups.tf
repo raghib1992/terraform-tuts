@@ -2,6 +2,7 @@
 resource "aws_security_group" "vpc-ssh" {
   name        = "vpc-ssh"
   description = "Dev VPC SSH"
+
   ingress {
     description = "Allow Port 22"
     from_port   = 22
@@ -27,6 +28,7 @@ resource "aws_security_group" "vpc-ssh" {
 resource "aws_security_group" "vpc-web" {
   name        = "vpc-web"
   description = "Dev VPC Web"
+  
   ingress {
     description = "Allow Port 80"
     from_port   = 80
