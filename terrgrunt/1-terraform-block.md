@@ -1,4 +1,4 @@
-- terraform block helps terragruntto communicate for resource management on target provider.
+- terraform block helps terragrunt to communicate for resource management on target provider.
 - with terraform block, it can find terraform configuration files ie. in github, gitlab, codecommit.
 - define arguments that can be passed to terraform cli.
 - define hooks(pre and post) to run before and after terraform.
