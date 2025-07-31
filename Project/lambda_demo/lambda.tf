@@ -1,7 +1,7 @@
 # Create Lambda Function
 data "archive_file" "lambda_zip_file" {
   type        = "zip"
-  source_dir = "${path.module}/lambda"
+  source_dir  = "${path.module}/lambda"
   output_path = "${path.module}/lambda.zip"
 }
 
@@ -30,7 +30,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
       {
         Action   = ["sqs:SendMessage"],
         Effect   = "Allow",
-        Resource = aws_sqs_queue.main_queue.arn
+        Resource = [aws_sqs_queue.order_sqs.arn, aws_sqs_queue.refund_sqs.arn]
       },
       {
         Action = [
@@ -56,12 +56,12 @@ resource "aws_lambda_function" "yt_lambda_function" {
   runtime          = "nodejs18.x"
   timeout          = 30
   source_code_hash = data.archive_file.lambda_zip_file.output_base64sha256
-  layers = [data.aws_lambda_layer_version.shared_layer.arn]
+  layers           = [data.aws_lambda_layer_version.shared_layer.arn]
 
   environment {
     variables = {
-      VIDEO_NAME = "Lambda Terraform Demo"
-      QUEUE_URL  = aws_sqs_queue.main_queue.url
+      QUEUE_SUBMIT_PAYMENT = aws_sqs_queue.order_sqs.url
+      QUEUE_TRACK_STATUS   = aws_sqs_queue.refund_sqs.url
     }
   }
 }

@@ -12,7 +12,15 @@ resource "aws_api_gateway_resource" "yt_api_resource" {
   # count = 10
   parent_id = aws_api_gateway_rest_api.yt_api.root_resource_id
   # path_part   = "demo-path-${count.index}"
-  path_part   = "demo-path"
+  path_part   = "bucket"
+  rest_api_id = aws_api_gateway_rest_api.yt_api.id
+}
+
+resource "aws_api_gateway_resource" "child_resource" {
+  # count = 10
+  parent_id = aws_api_gateway_resource.yt_api_resource.id
+  # path_part   = "demo-path-${count.index}"
+  path_part   = "id"
   rest_api_id = aws_api_gateway_rest_api.yt_api.id
 }
 
@@ -20,6 +28,15 @@ resource "aws_api_gateway_method" "yt_method" {
   # count = 10
   # resource_id   = aws_api_gateway_resource.yt_api_resource[count.index].id
   resource_id   = aws_api_gateway_resource.yt_api_resource.id
+  rest_api_id   = aws_api_gateway_rest_api.yt_api.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method" "bucket_id_method" {
+  # count = 10
+  # resource_id   = aws_api_gateway_resource.yt_api_resource[count.index].id
+  resource_id   = aws_api_gateway_resource.child_resource.id
   rest_api_id   = aws_api_gateway_rest_api.yt_api.id
   http_method   = "POST"
   authorization = "NONE"
@@ -38,6 +55,20 @@ resource "aws_api_gateway_integration" "lambda_integration" {
   uri = aws_lambda_function.yt_lambda_function.invoke_arn
 }
 
+resource "aws_api_gateway_integration" "lambda_bucket_integration" {
+  # count                   = 10
+  # http_method             = aws_api_gateway_method.yt_method[count.index].http_method
+  http_method = aws_api_gateway_method.bucket_id_method.http_method
+  # resource_id             = aws_api_gateway_resource.yt_api_resource[count.index].id
+  resource_id             = aws_api_gateway_resource.child_resource.id
+  rest_api_id             = aws_api_gateway_rest_api.yt_api.id
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  # uri                     = aws_lambda_function.yt_lambda_function[count.index].invoke_arn
+  uri = aws_lambda_function.yt_lambda_function.invoke_arn
+}
+
+
 resource "aws_api_gateway_deployment" "api_deployment" {
   rest_api_id = aws_api_gateway_rest_api.yt_api.id
 
@@ -54,7 +85,8 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   }
 
   depends_on = [
-    aws_api_gateway_integration.lambda_integration
+    aws_api_gateway_integration.lambda_integration,
+    aws_api_gateway_integration.lambda_bucket_integration
   ]
 }
 
