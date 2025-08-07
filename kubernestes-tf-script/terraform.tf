@@ -11,5 +11,4 @@ terraform {
 
 provider "kubernetes" {
   config_path = "/root/.kube/config"
-  host        = "https://localhost:6443"
 }

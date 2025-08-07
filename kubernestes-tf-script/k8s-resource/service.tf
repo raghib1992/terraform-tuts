@@ -4,7 +4,7 @@ resource "kubernetes_service" "webapp-service" {
   }
   spec {
     selector = {
-      name= "webapp"
+      name = "webapp"
     }
     type = "NodePort"
     port {
