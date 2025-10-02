@@ -3,3 +3,5 @@ terraform.tfstate
 permanent.pub
 permanent.*
 permanent
+.DS_Store
+**/.DS_Store
