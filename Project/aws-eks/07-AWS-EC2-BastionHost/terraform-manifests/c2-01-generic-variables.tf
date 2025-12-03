@@ -3,7 +3,7 @@
 variable "aws_region" {
   description = "Region in which AWS Resources to be created"
   type = string
-  default = "eu-north-1"  
+  default = "us-east-1"  
 }
 # Environment Variable
 variable "environment" {
@@ -15,5 +15,5 @@ variable "environment" {
 variable "business_divsion" {
   description = "Business Division in the large organization this Infrastructure belongs"
   type = string
-  default = "uzrag"
+  default = "SAP"
 }

@@ -1,21 +1,23 @@
 # AWS Availability Zones Datasource
-data "aws_availability_zones" "available" {
+data "aws_availability_zones" "available" {  
+  #state = "available"
 }
+
 
 # Create VPC Terraform Module
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   #version = "3.11.0"
   #version = "~> 3.11"
-  #version = "4.0.1"
-  version = "6.5.0"  
+  version = "4.0.1"  
   
   # VPC Basic Details
   name = local.eks_cluster_name
   cidr = var.vpc_cidr_block
+  #azs             = var.vpc_availability_zones
   azs             = data.aws_availability_zones.available.names
   public_subnets  = var.vpc_public_subnets
-  private_subnets = var.vpc_private_subnets
+  private_subnets = var.vpc_private_subnets  
 
   # Database Subnets
   database_subnets = var.vpc_database_subnets
