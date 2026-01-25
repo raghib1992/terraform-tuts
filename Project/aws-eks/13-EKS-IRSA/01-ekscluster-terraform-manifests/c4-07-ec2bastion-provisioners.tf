@@ -27,5 +27,4 @@ resource "null_resource" "copy_ec2_keys" {
     working_dir = "local-exec-output-files/"
     #on_failure = continue
   }
-
 }
